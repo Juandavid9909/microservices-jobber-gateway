@@ -3,6 +3,7 @@ import http from "http";
 import { Application, json, NextFunction, Request, Response, urlencoded } from "express";
 import { config } from "@gateway/config";
 import { CustomError, IErrorResponse, winstonLogger } from "@juandavid9909/jobber-shared";
+import { elasticSearch } from "@gateway/elasticsearch";
 import { Logger } from "winston";
 import { StatusCodes } from "http-status-codes";
 import compression from "compression";
@@ -35,7 +36,7 @@ export class GatewayServer {
     app.use(
       cookieSession({
         name: "session",
-        keys: [`${ config.SECRET_KEY_ONE }`, `${ config.SECRET_KEY_TWO }`],
+        keys: [`${config.SECRET_KEY_ONE}`, `${config.SECRET_KEY_TWO}`],
         maxAge: 24 * 7 * 3600000,
         secure: config.NODE_ENV !== "development"
         // sameSite: "none"
@@ -60,7 +61,9 @@ export class GatewayServer {
 
   private routesMiddleware(): void {}
 
-  private startElasticsearch(): void {}
+  private startElasticsearch(): void {
+    elasticSearch.checkConnection();
+  }
 
   private errorHandler(app: Application): void {
     app.use("*", (req: Request, res: Response, next: NextFunction) => {
