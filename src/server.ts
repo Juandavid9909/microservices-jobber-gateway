@@ -1,6 +1,7 @@
 import http from "http";
 
 import { Application, json, NextFunction, Request, Response, urlencoded } from "express";
+import { appRoutes } from "@gateway/routes";
 import { config } from "@gateway/config";
 import { CustomError, IErrorResponse, winstonLogger } from "@juandavid9909/jobber-shared";
 import { elasticSearch } from "@gateway/elasticsearch";
@@ -25,7 +26,7 @@ export class GatewayServer {
   public start(): void {
     this.securityMiddleware(this.app);
     this.standardMiddleware(this.app);
-    this.routesMiddleware();
+    this.routesMiddleware(this.app);
     this.startElasticsearch();
     this.errorHandler(this.app);
     this.startServer(this.app);
@@ -59,7 +60,9 @@ export class GatewayServer {
     app.use(urlencoded({ extended: true, limit: "200mb" }));
   }
 
-  private routesMiddleware(): void {}
+  private routesMiddleware(app: Application): void {
+    appRoutes(app);
+  }
 
   private startElasticsearch(): void {
     elasticSearch.checkConnection();
