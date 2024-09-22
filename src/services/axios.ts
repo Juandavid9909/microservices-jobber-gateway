@@ -12,7 +12,7 @@ export class AxiosService {
   public axiosCreateInstance(baseUrl: string, serviceName?: string): ReturnType<typeof axios.create> {
     let requestGatewayToken = "";
 
-    if(serviceName) {
+    if (serviceName) {
       requestGatewayToken = sign({ id: serviceName }, `${config.GATEWAY_JWT_TOKEN}`);
     }
 
@@ -20,7 +20,7 @@ export class AxiosService {
       baseURL: baseUrl,
       headers: {
         "Content-Type": "application/json",
-        "Accept": "application/json",
+        Accept: "application/json",
         requestGatewayToken
       },
       withCredentials: true

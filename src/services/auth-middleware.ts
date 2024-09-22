@@ -5,7 +5,7 @@ import { verify } from "jsonwebtoken";
 
 class AuthMiddleware {
   public verifyUser(req: Request, _res: Response, next: NextFunction): void {
-    if(!req.session?.jwt) {
+    if (!req.session?.jwt) {
       throw new NotAuthorizedError("Token is not available. Please login again.", "GatewayService verifyUser() method error");
     }
 
@@ -16,14 +16,17 @@ class AuthMiddleware {
     } catch (error) {
       console.log(error);
 
-      throw new NotAuthorizedError("Token is not available. Please login again.", "GatewayService verifyUser() method invalid session error");
+      throw new NotAuthorizedError(
+        "Token is not available. Please login again.",
+        "GatewayService verifyUser() method invalid session error"
+      );
     }
 
     next();
   }
 
   public checkAuthentication(req: Request, _res: Response, next: NextFunction): void {
-    if(!req.currentUser) {
+    if (!req.currentUser) {
       throw new BadRequestError("Authentication is required to access this route.", "GatewayService checkAuthentication() method error");
     }
 
