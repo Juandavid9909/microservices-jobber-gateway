@@ -1,6 +1,7 @@
 import http from "http";
 
 import { Application, json, NextFunction, Request, Response, urlencoded } from "express";
+import { config } from "@gateway/config";
 import { CustomError, IErrorResponse, winstonLogger } from "@juandavid9909/jobber-shared";
 import { Logger } from "winston";
 import { StatusCodes } from "http-status-codes";
@@ -11,7 +12,7 @@ import helmet from "helmet";
 import hpp from "hpp";
 
 const SERVER_PORT = 4000;
-const log: Logger = winstonLogger("http://localhost:9200", "apiGatewayServer", "debug");
+const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, "apiGatewayServer", "debug");
 
 export class GatewayServer {
   private app: Application;
@@ -34,9 +35,9 @@ export class GatewayServer {
     app.use(
       cookieSession({
         name: "session",
-        keys: [],
+        keys: [`${ config.SECRET_KEY_ONE }`, `${ config.SECRET_KEY_TWO }`],
         maxAge: 24 * 7 * 3600000,
-        secure: false
+        secure: config.NODE_ENV !== "development"
         // sameSite: "none"
       })
     );
@@ -44,7 +45,7 @@ export class GatewayServer {
     app.use(helmet());
     app.use(
       cors({
-        origin: "",
+        origin: config.CLIENT_URL,
         credentials: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
       })
