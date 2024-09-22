@@ -1,3 +1,5 @@
+import http from "http";
+
 import { Application, json, NextFunction, Request, Response, urlencoded } from "express";
 import { CustomError, IErrorResponse, winstonLogger } from "@juandavid9909/jobber-shared";
 import { Logger } from "winston";
@@ -7,7 +9,6 @@ import cookieSession from "cookie-session";
 import cors from "cors";
 import helmet from "helmet";
 import hpp from "hpp";
-import http from "http";
 
 const SERVER_PORT = 4000;
 const log: Logger = winstonLogger("http://localhost:9200", "apiGatewayServer", "debug");
@@ -35,17 +36,19 @@ export class GatewayServer {
         name: "session",
         keys: [],
         maxAge: 24 * 7 * 3600000,
-        secure: false,
+        secure: false
         // sameSite: "none"
       })
     );
     app.use(hpp());
     app.use(helmet());
-    app.use(cors({
-      origin: "",
-      credentials: true,
-      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-    }));
+    app.use(
+      cors({
+        origin: "",
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+      })
+    );
   }
 
   private standardMiddleware(app: Application): void {
@@ -54,19 +57,15 @@ export class GatewayServer {
     app.use(urlencoded({ extended: true, limit: "200mb" }));
   }
 
-  private routesMiddleware(): void {
+  private routesMiddleware(): void {}
 
-  }
-
-  private startElasticsearch(): void {
-
-  }
+  private startElasticsearch(): void {}
 
   private errorHandler(app: Application): void {
     app.use("*", (req: Request, res: Response, next: NextFunction) => {
-      const fullUrl = `${ req.protocol }://${ req.get("host") }${ req.originalUrl }`;
+      const fullUrl = `${req.protocol}://${req.get("host")}${req.originalUrl}`;
 
-      log.log("error", `${ fullUrl } endpoint does not exist.`, "");
+      log.log("error", `${fullUrl} endpoint does not exist.`, "");
 
       res.status(StatusCodes.NOT_FOUND).json({ message: "The endpoint called does not exist." });
 
@@ -74,9 +73,9 @@ export class GatewayServer {
     });
 
     app.use("*", (error: IErrorResponse, _req: Request, res: Response, next: NextFunction) => {
-      log.log("error", `GatewayService ${ error.comingFrom }:`, error);
+      log.log("error", `GatewayService ${error.comingFrom}:`, error);
 
-      if(error instanceof CustomError) {
+      if (error instanceof CustomError) {
         res.status(error.statusCode).json(error.serializeErrors());
       }
 
@@ -96,10 +95,10 @@ export class GatewayServer {
 
   private async startHttpServer(httpServer: http.Server): Promise<void> {
     try {
-      log.info(`Gateway server has started with process id ${ process.pid }`);
+      log.info(`Gateway server has started with process id ${process.pid}`);
 
       httpServer.listen(SERVER_PORT, () => {
-        log.info(`Gateway server running on port ${ SERVER_PORT }`);
+        log.info(`Gateway server running on port ${SERVER_PORT}`);
       });
     } catch (error) {
       log.log("error", "GatewayService startHttpServer() method error:", error);

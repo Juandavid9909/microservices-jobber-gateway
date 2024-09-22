@@ -2,7 +2,7 @@ import { GatewayServer } from "@gateway/server";
 import express, { Express } from "express";
 
 class Application {
-  public initialize(): void  {
+  public initialize(): void {
     const app: Express = express();
     const server: GatewayServer = new GatewayServer(app);
 
