@@ -2,6 +2,7 @@ import http from "http";
 
 import { Application, json, NextFunction, Request, Response, urlencoded } from "express";
 import { appRoutes } from "@gateway/routes";
+import { axiosAuthInstance } from "@gateway/services/api/auth.service";
 import { config } from "@gateway/config";
 import { CustomError, IErrorResponse, winstonLogger } from "@juandavid9909/jobber-shared";
 import { elasticSearch } from "@gateway/elasticsearch";
@@ -52,6 +53,14 @@ export class GatewayServer {
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
       })
     );
+
+    app.use((req: Request, _res: Response, next: NextFunction) => {
+      if (req.session?.jwt) {
+        axiosAuthInstance.defaults.headers["Authorization"] = `Bearer ${req.session?.jwt}`;
+      }
+
+      next();
+    });
   }
 
   private standardMiddleware(app: Application): void {
