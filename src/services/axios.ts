@@ -21,7 +21,7 @@ export class AxiosService {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        requestGatewayToken
+        gatewayToken: requestGatewayToken
       },
       withCredentials: true
     });
